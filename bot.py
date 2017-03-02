@@ -38,15 +38,15 @@ async def handle_color(message):
 
 async def change_song(message):
     global current_track
-    global elevator
+#    global elevator
     contents = message.content.split(' ')
     if len(contents) == 2:
         current_track = contents[1]
-        if in_elevator:
-            elevator.stop()
-            elevator = await client.voice_clients[0].create_ytdl_player(current_track)
-            elevator.volume = .2
-            elevator.start()
+#        if in_elevator:
+##            elevator.stop()
+#            elevator = await client.voice_clients[0].create_ytdl_player(current_track)
+##            elevator.volume = .2
+##            elevator.start()
     else:
         await client.send_message(message.channel, 'The current song is : "{}"'.format(elevator.title))
 
@@ -129,6 +129,12 @@ async def on_voice_state_update(before, after):
         current_track = ELEVATOR_MUSIC
         in_elevator = False
     elif not in_elevator and len(voice_channel.voice_members) > 0:
+        in_elevator = True
+        voice_client = await client.join_voice_channel(voice_channel)
+        elevator = await voice_client.create_ytdl_player(current_track)
+        elevator.volume = .2
+        elevator.start()
+    elif not in_elevator and len(voice_channel.voice_members) > 0 and current_track != ELEVATOR_MUSIC:
         in_elevator = True
         voice_client = await client.join_voice_channel(voice_channel)
         elevator = await voice_client.create_ytdl_player(current_track)
